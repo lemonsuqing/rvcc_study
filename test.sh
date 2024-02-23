@@ -38,5 +38,8 @@ assert() {
 assert 0 0
 assert 42 42
 
+# [2] 支持+ -运算符
+assert 7 '18+14-32+7'
+
 # 如果运行正常未提前退出，程序将显示OK
 echo OK
