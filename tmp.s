@@ -1,30 +1,40 @@
   .globl main
 main:
-  li a0, 23
+  addi sp, sp, -8
+  sd fp, 0(sp)
+  mv fp, sp
+  addi sp, sp, -208
+  addi a0, fp, -8
   addi sp, sp, -8
   sd a0, 0(sp)
-  li a0, 12
-  ld a1, 0(sp)
-  addi sp, sp, 8
-  add a0, a0, a1
   li a0, 3
-  addi sp, sp, -8
-  sd a0, 0(sp)
-  li a0, 99
   ld a1, 0(sp)
   addi sp, sp, 8
-  div a0, a0, a1
+  sd a0, 0(a1)
+  addi a0, fp, -16
   addi sp, sp, -8
   sd a0, 0(sp)
-  li a0, 12
+  li a0, 4
+  ld a1, 0(sp)
+  addi sp, sp, 8
+  sd a0, 0(a1)
+  addi a0, fp, -8
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  li a0, 1
+  ld a1, 0(sp)
+  addi sp, sp, 8
+  sd a0, 0(a1)
+  addi a0, fp, -16
+  ld a0, 0(a0)
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  addi a0, fp, -8
+  ld a0, 0(a0)
   ld a1, 0(sp)
   addi sp, sp, 8
   add a0, a0, a1
-  li a0, 66
-  addi sp, sp, -8
-  sd a0, 0(sp)
-  li a0, 78
-  ld a1, 0(sp)
+  mv sp, fp
+  ld fp, 0(sp)
   addi sp, sp, 8
-  sub a0, a0, a1
   ret

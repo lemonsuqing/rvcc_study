@@ -16,6 +16,7 @@
 
 // 设置每个人终结符的种类
 typedef enum{
+    TK_IDENT,   // 标记符，可以为变量名、函数名等
     TK_PUNCT,   // 操作符，如：+ - * /
     TK_NUM,     // 数字
     TK_EOF,     // 文件终止符
@@ -57,7 +58,9 @@ typedef enum{
     ND_NE,          // !=
     ND_LT,          // <
     ND_LE,          // <=
+    ND_ASSIGN,    // 赋值
     ND_EXPR_STMT,   // 表达式语句
+    ND_VAR,         // 变量
     ND_NUM,         // 数字
 } NodeKind;
 
@@ -68,6 +71,7 @@ struct Node {
     Node *Next;     // 指向下一个节点
     Node *LHS;      // 左部，left-hand side
     Node *RHS;      // 右部，right-hand side
+    char Name;      // 存储ND_VAR的字符串
     int Val;        // 存储ND_NUM种类的值
 };
 

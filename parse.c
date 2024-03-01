@@ -3,16 +3,17 @@
 // program = stmt* 程序是由多个语句构成的
 // stmt = exprStmt 语句算由表达式语句构成
 // exprStmt = expr ";" 表达式语句由表达式和分号构成
-// expr = equality 相等性的判断
+// expr = assign 表达式由多个赋值式构成
+// assign = equality ("=" assign)? 赋值式由多个关系式和递归的赋值式构成(就可以解析a=b=3)
 // equality = relational ("==" relational | "!=" relational)* 判断里面有很多关系运算
 // relational = add ("<" add |"<=" add | ">" add |">=" add)* 先相等、不等，在大小判断。优先级
 // add = mul ("+" mul | "-" mul)*
 // mul = primary ("*" unary | "/" unary)*
-// unary = ("+" | "-") unary | primary
-// 乘数由一元运算数构成，而一元运算数前面可能带有加号或者减号（多个）
+// unary = ("+" | "-") unary | primary 乘数由一元运算数构成，而一元运算数前面可能带有加号或者减号（多个）
 // primary = "(" expr ")" | num
 static Node *exprStmt(Token **Rest, Token *Tok);
 static Node *expr(Token **Rest, Token *Tok);
+static Node *assign(Token **Rest, Token *Tok);
 static Node *equality(Token **Rest, Token *Tok);
 static Node *relational(Token **Rest, Token *Tok);
 static Node *add(Token **Rest, Token *Tok);
@@ -49,7 +50,15 @@ static Node *newNum(int Val){
     return Nd;
 }
 
-// 解析语句 stmt = exprStmt
+// 新变量
+static Node *newVarNode(char Name){
+  Node *Nd = newNode(ND_VAR);
+  Nd->Name = Name;
+  return Nd;
+}
+
+// 解析语句
+// stmt = exprStmt
 static Node *stmt(Token **Rest, Token *Tok) { return exprStmt(Rest, Tok); }
 
 // 解析表达式语句
@@ -61,7 +70,22 @@ static Node *exprStmt(Token **Rest, Token *Tok) {
 }
 
 // 解析表达式
-static Node *expr(Token **Rest, Token *Tok) { return equality(Rest, Tok); }
+// expr = assign
+static Node *expr(Token **Rest, Token *Tok) { return assign(Rest, Tok); }
+
+// 解析赋值
+// assign = equality ("=" assign)?
+static Node *assign(Token **Rest, Token *Tok){
+  // equality
+  Node *Nd = equality(&Tok, Tok);
+
+  // 可能存在递归赋值，如a=b=1
+  // ("=" assign)?
+  if (equal(Tok, "="))
+    Nd = newBinary(ND_ASSIGN, Nd, assign(&Tok, Tok->Next));
+  *Rest = Tok;
+  return Nd;
+}
 
 // 解析相等性
 // equality = relational ("==" relational | "!=" relational)*
@@ -199,6 +223,13 @@ static Node *primary(Token **Rest, Token *Tok) {
   if (equal(Tok, "(")) {
     Node *Nd = expr(&Tok, Tok->Next);
     *Rest = skip(Tok, ")");
+    return Nd;
+  }
+
+  // ident
+  if (Tok->Kind == TK_IDENT) {
+    Node *Nd = newVarNode(*Tok->Loc);
+    *Rest = Tok->Next;
     return Nd;
   }
 
