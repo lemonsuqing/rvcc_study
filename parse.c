@@ -1,5 +1,8 @@
 #include "rvcc.h"
 
+// program = stmt* 程序是由多个语句构成的
+// stmt = exprStmt 语句算由表达式语句构成
+// exprStmt = expr ";" 表达式语句由表达式和分号构成
 // expr = equality 相等性的判断
 // equality = relational ("==" relational | "!=" relational)* 判断里面有很多关系运算
 // relational = add ("<" add |"<=" add | ">" add |">=" add)* 先相等、不等，在大小判断。优先级
@@ -8,6 +11,7 @@
 // unary = ("+" | "-") unary | primary
 // 乘数由一元运算数构成，而一元运算数前面可能带有加号或者减号（多个）
 // primary = "(" expr ")" | num
+static Node *exprStmt(Token **Rest, Token *Tok);
 static Node *expr(Token **Rest, Token *Tok);
 static Node *equality(Token **Rest, Token *Tok);
 static Node *relational(Token **Rest, Token *Tok);
@@ -45,11 +49,22 @@ static Node *newNum(int Val){
     return Nd;
 }
 
+// 解析语句 stmt = exprStmt
+static Node *stmt(Token **Rest, Token *Tok) { return exprStmt(Rest, Tok); }
+
+// 解析表达式语句
+// exprStmt = expr ";"
+static Node *exprStmt(Token **Rest, Token *Tok) {
+  Node *Nd = newUnary(ND_EXPR_STMT, expr(&Tok, Tok));
+  *Rest = skip(Tok, ";");
+  return Nd;
+}
+
 // 解析表达式
 static Node *expr(Token **Rest, Token *Tok) { return equality(Rest, Tok); }
 
 // 解析相等性
-
+// equality = relational ("==" relational | "!=" relational)*
 static Node *equality(Token **Rest, Token *Tok){
   // relational
   Node *Nd = relational(&Tok, Tok);
@@ -113,7 +128,7 @@ static Node *relational(Token **Rest, Token *Tok){
 }
 
 // 解析加减
-
+// add = mul ("+" mul | "-" mul)*
 static Node *add(Token **Rest, Token *Tok)
 {
   Node *Nd = mul(&Tok, Tok);
@@ -138,7 +153,7 @@ static Node *add(Token **Rest, Token *Tok)
 }
 
 // 解析乘除
-
+// mul = unary ("*" unary | "/" unary)*
 static Node *mul(Token **Rest, Token *Tok) {
   // unary
   Node *Nd = unary(&Tok, Tok);
@@ -163,7 +178,7 @@ static Node *mul(Token **Rest, Token *Tok) {
 }
 
 // 解析一元运算数
-
+// unary = ("+" | "-") unary | primary
 static Node *unary(Token **Rest, Token *Tok){
     // '+' unary
     if(equal(Tok, "+"))
@@ -178,7 +193,7 @@ static Node *unary(Token **Rest, Token *Tok){
 }
 
 // 解析括号、数字
-
+// primary = "(" expr ")" | num
 static Node *primary(Token **Rest, Token *Tok) {
   // "(" expr ")"
   if (equal(Tok, "(")) {
@@ -199,9 +214,15 @@ static Node *primary(Token **Rest, Token *Tok) {
 }
 
 // 语法解析入口函数
+// program = stmt*
 Node *parse(Token *Tok) {
-  Node *Nd = expr(&Tok, Tok);
-  if (Tok->Kind != TK_EOF)
-    errorTok(Tok, "extra token");
-  return Nd;
+  // 这里使用了和词法分析类似的单向链表结构
+  Node Head = {};
+  Node *Cur = &Head;
+  // stmt*
+  while (Tok->Kind != TK_EOF) {
+    Cur->Next = stmt(&Tok, Tok);
+    Cur = Cur->Next;
+  }
+  return Head.Next;
 }

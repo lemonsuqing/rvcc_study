@@ -10,11 +10,3 @@
 如需发起Issue或者PR，或者是其他问题，也请访问：https://github.com/sunshaoce/rvcc-course 。
 
 若想学习请到课程链接中观看学习。
-
-## 完成进度记录
-
-    24/02/23 test1，test2
-
-    24/02/23 test3, test4, test5
-
-    24/02/23 test6
