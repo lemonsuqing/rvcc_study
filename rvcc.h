@@ -22,6 +22,7 @@
 typedef enum{
     TK_IDENT,   // 标记符，可以为变量名、函数名等
     TK_PUNCT,   // 操作符，如：+ - * /
+    TK_KEYWORD, // 关键字
     TK_NUM,     // 数字
     TK_EOF,     // 文件终止符
 } TokenKind;
@@ -80,14 +81,14 @@ typedef enum{
     ND_NE,          // !=
     ND_LT,          // <
     ND_LE,          // <=
-    ND_ASSIGN,    // 赋值
+    ND_ASSIGN,      // 赋值
+    ND_RETURN,      // 返回
     ND_EXPR_STMT,   // 表达式语句
     ND_VAR,         // 变量
     ND_NUM,         // 数字
 } NodeKind;
 
 // AST中二叉树节点
-typedef struct Node Node;
 struct Node {
     NodeKind Kind;  //节点种类
     Node *Next;     // 指向下一个节点
