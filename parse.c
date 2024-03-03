@@ -3,8 +3,9 @@
 // 在解析时，全部的变量实例都被累加到这个列表里。
 Obj *Locals;
 
-// program = stmt* 程序是由多个语句构成的
-// stmt = "return" expr ";" | exprStmt 语句算由表达式语句构成
+// program = "{" compoundStmt  { 程序是由多个语句构成的 }
+// compoundStmt = stmt* "}"
+// stmt = "return" expr ";" | "{" compoundStmt | exprStmt 语句算由表达式语句构成(retuen语句、括号体...)
 // exprStmt = expr ";" 表达式语句由表达式和分号构成
 // expr = assign 表达式由多个赋值式构成
 // assign = equality ("=" assign)? 赋值式由多个关系式和递归的赋值式构成(就可以解析a=b=3)
@@ -14,6 +15,7 @@ Obj *Locals;
 // mul = primary ("*" unary | "/" unary)*
 // unary = ("+" | "-") unary | primary 乘数由一元运算数构成，而一元运算数前面可能带有加号或者减号（多个）
 // primary = "(" expr ")" | num
+static Node *compoundStmt(Token **Rest, Token *Tok);
 static Node *exprStmt(Token **Rest, Token *Tok);
 static Node *expr(Token **Rest, Token *Tok);
 static Node *assign(Token **Rest, Token *Tok);
@@ -82,7 +84,7 @@ static Obj *newLVar(char *Name) {
 }
 
 // 解析语句
-// stmt = "return" expr ";" | exprStmt
+// stmt = "return" expr ";" | "{" compoundStmt | exprStmt
 static Node *stmt(Token **Rest, Token *Tok) {
   // "return" expr ";"
   if(equal(Tok, "return")){
@@ -91,8 +93,31 @@ static Node *stmt(Token **Rest, Token *Tok) {
     return Nd;
   }
 
+  // "{" compoundStmt
+  if(equal(Tok, "{"))
+    return compoundStmt(Rest, Tok->Next);
+
   // exprStmt
   return exprStmt(Rest, Tok);
+}
+
+// 解析复合语句
+// compoundStmt = stmt* "}"
+static Node *compoundStmt(Token **Rest, Token *Tok){
+  // 这里用了和词法分析类似的单向链表结构
+  Node Head = {};
+  Node *Cur = &Head;
+  // Stmt* "}"
+  while (!equal(Tok, "}")){
+    Cur->Next = stmt(&Tok, Tok);
+    Cur = Cur->Next;
+  }
+
+  // Nd的Body存储了{}内解析的语句
+  Node *Nd = newNode(ND_BLOCK);
+  Nd->Body = Head.Next;
+  *Rest = Tok->Next;
+  return Nd;
 }
 
 // 解析表达式语句
@@ -284,21 +309,14 @@ static Node *primary(Token **Rest, Token *Tok) {
 }
 
 // 语法解析入口函数
-// program = stmt*
+// program = "{" compoundStmt
 Function *parse(Token *Tok) {
-  // 这里使用了和词法分析类似的单向链表结构
-  Node Head = {};
-  Node *Cur = &Head;
-
-  // stmt*
-  while (Tok->Kind != TK_EOF) {
-    Cur->Next = stmt(&Tok, Tok);
-    Cur = Cur->Next;
-  }
+  // "{"
+  Tok = skip(Tok, "{");
 
   // 函数体存储语句的AST，Locals存储变量
   Function *Prog = calloc(1, sizeof(Function));
-  Prog->Body = Head.Next;
+  Prog->Body = compoundStmt(&Tok, Tok);
   Prog->Locals = Locals;
   return Prog;
 }
