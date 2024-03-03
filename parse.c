@@ -5,7 +5,10 @@ Obj *Locals;
 
 // program = "{" compoundStmt  { 程序是由多个语句构成的 }
 // compoundStmt = stmt* "}"
-// stmt = "return" expr ";" | "{" compoundStmt | exprStmt 语句算由表达式语句构成(retuen语句、括号体...)
+// stmt = "return" expr ";" 
+//        | "if" "(" expr ")" stmt ("else" stmt)?
+//        | "{" compoundStmt 
+//        | exprStmt 语句算由表达式语句构成(retuen语句、括号体...)
 // exprStmt = expr? ";" 表达式语句由表达式和分号构成
 // expr = assign 表达式由多个赋值式构成
 // assign = equality ("=" assign)? 赋值式由多个关系式和递归的赋值式构成(就可以解析a=b=3)
@@ -84,12 +87,32 @@ static Obj *newLVar(char *Name) {
 }
 
 // 解析语句
-// stmt = "return" expr ";" | "{" compoundStmt | exprStmt
+// stmt = "return" expr ";"
+//        | "if" "(" expr ")" stmt ("else" stmt)?
+//        | "{" compoundStmt
+//        | exprStmt
 static Node *stmt(Token **Rest, Token *Tok) {
   // "return" expr ";"
   if(equal(Tok, "return")){
     Node *Nd = newUnary(ND_RETURN, expr(&Tok, Tok->Next));
     *Rest = skip(Tok, ";");
+    return Nd;
+  }
+
+  // 解析if语句
+  // "if" "(" expr ")" stmt ("else" stmt)?
+  if(equal(Tok, "if")){
+    Node *Nd = newNode(ND_IF);
+    // "(" expr ")", 条件内语句
+    Tok = skip(Tok->Next, "(");
+    Nd->Cond = expr(&Tok,Tok);
+    Tok = skip(Tok, ")");
+    // stmt, 符合条件后的语句
+    Nd->Then = stmt(&Tok, Tok);
+    // ("else" stmt)?，不符合条件后的语句
+    if(equal(Tok, "else"))
+      Nd->Els = stmt(&Tok, Tok->Next);
+    *Rest = Tok;
     return Nd;
   }
 

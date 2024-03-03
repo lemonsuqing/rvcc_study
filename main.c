@@ -13,7 +13,7 @@ int main(int Argc, char **Argv){
     Token *Tok = tokenize(Argv[1]);
 
     // 解析终结符流
-   Function *Prog = parse(Tok);
+    Function *Prog = parse(Tok);
 
     codegen(Prog);
 
