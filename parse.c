@@ -6,7 +6,7 @@ Obj *Locals;
 // program = "{" compoundStmt  { 程序是由多个语句构成的 }
 // compoundStmt = stmt* "}"
 // stmt = "return" expr ";" | "{" compoundStmt | exprStmt 语句算由表达式语句构成(retuen语句、括号体...)
-// exprStmt = expr ";" 表达式语句由表达式和分号构成
+// exprStmt = expr? ";" 表达式语句由表达式和分号构成
 // expr = assign 表达式由多个赋值式构成
 // assign = equality ("=" assign)? 赋值式由多个关系式和递归的赋值式构成(就可以解析a=b=3)
 // equality = relational ("==" relational | "!=" relational)* 判断里面有很多关系运算
@@ -121,8 +121,15 @@ static Node *compoundStmt(Token **Rest, Token *Tok){
 }
 
 // 解析表达式语句
-// exprStmt = expr ";"
+// exprStmt = expr? ";"
 static Node *exprStmt(Token **Rest, Token *Tok) {
+  // ";"
+  if(equal(Tok, ";")){
+    *Rest = Tok->Next;
+    return newNode(ND_BLOCK);
+  }
+
+  // expr ";"
   Node *Nd = newUnary(ND_EXPR_STMT, expr(&Tok, Tok));
   *Rest = skip(Tok, ";");
   return Nd;

@@ -4,9 +4,7 @@ main:
   sd fp, 0(sp)
   mv fp, sp
   addi sp, sp, -0
-  li a0, 1
-  li a0, 2
-  li a0, 3
+  li a0, 5
   j .L.return
 .L.return:
   mv sp, fp
