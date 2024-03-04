@@ -18,7 +18,7 @@ Obj *Locals;
 // relational = add ("<" add |"<=" add | ">" add |">=" add)* 先相等、不等，在大小判断。优先级
 // add = mul ("+" mul | "-" mul)*
 // mul = primary ("*" unary | "/" unary)*
-// unary = ("+" | "-") unary | primary 乘数由一元运算数构成，而一元运算数前面可能带有加号或者减号（多个）
+// unary = ("+" | "-" | "*" | "&") unary | primary 乘数由一元运算数构成，而一元运算数前面可能带有加号或者减号（多个）
 // primary = "(" expr ")" | num
 static Node *compoundStmt(Token **Rest, Token *Tok);
 static Node *exprStmt(Token **Rest, Token *Tok);
@@ -347,7 +347,7 @@ static Node *mul(Token **Rest, Token *Tok) {
 }
 
 // 解析一元运算数
-// unary = ("+" | "-") unary | primary
+// unary = ("+" | "-" | "*" | "&") unary | primary
 static Node *unary(Token **Rest, Token *Tok){
     // '+' unary
     if(equal(Tok, "+"))
@@ -357,6 +357,14 @@ static Node *unary(Token **Rest, Token *Tok){
     if(equal(Tok, "-"))
         return newUnary(ND_NEG, unary(Rest, Tok->Next), Tok);
     
+    // '&' unary
+    if(equal(Tok, "&"))
+      return newUnary(ND_ADDR, unary(Rest, Tok->Next), Tok);
+
+    // "*" unary
+    if(equal(Tok, "*"))
+      return newUnary(ND_DEREF, unary(Rest, Tok->Next), Tok);
+
     // primary
     return primary(Rest, Tok);
 }
