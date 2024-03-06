@@ -37,43 +37,23 @@ main:
   addi sp, sp, 8
   # 将a0的值，写入到a1中存放的地址
   sd a0, 0(a1)
-  # 将8加载到a0中
-  li a0, 8
-  # 压栈，将a0的值存入栈顶
-  addi sp, sp, -8
-  sd a0, 0(sp)
-  # 将1加载到a0中
-  li a0, 1
-  # 弹栈，将栈顶的值存入a1
-  ld a1, 0(sp)
-  addi sp, sp, 8
-  # a0×a1，结果写入a0
-  mul a0, a0, a1
-  # 压栈，将a0的值存入栈顶
-  addi sp, sp, -8
-  sd a0, 0(sp)
-  # 获取变量x的栈内地址为-16(fp)
-  addi a0, fp, -16
-  # 弹栈，将栈顶的值存入a1
-  ld a1, 0(sp)
-  addi sp, sp, 8
-  # a0+a1，结果写入a0
-  add a0, a0, a1
-  # 压栈，将a0的值存入栈顶
-  addi sp, sp, -8
-  sd a0, 0(sp)
-  # 将7加载到a0中
-  li a0, 7
-  # 弹栈，将栈顶的值存入a1
-  ld a1, 0(sp)
-  addi sp, sp, 8
-  # 将a0的值，写入到a1中存放的地址
-  sd a0, 0(a1)
 # 返回语句
   # 获取变量y的栈内地址为-8(fp)
   addi a0, fp, -8
   # 读取a0中存放的地址，得到的值存入a0
   ld a0, 0(a0)
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 获取变量x的栈内地址为-16(fp)
+  addi a0, fp, -16
+  # 读取a0中存放的地址，得到的值存入a0
+  ld a0, 0(a0)
+  # 弹栈，将栈顶的值存入a1
+  ld a1, 0(sp)
+  addi sp, sp, 8
+  # a0+a1，结果写入a0
+  add a0, a0, a1
   # 跳转到.L.return段
   j .L.return
 

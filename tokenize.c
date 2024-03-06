@@ -71,6 +71,18 @@ Token *skip(Token *Tok, char *Str){
     return Tok->Next;
 }
 
+// 消耗掉指定的Token
+bool consume(Token **Rest, Token *Tok, char *Str){
+    // 存在
+    if(equal(Tok, Str)){
+        *Rest = Tok->Next;
+        return true;
+    }
+    // 不存在
+    *Rest = Tok;
+    return false;
+}
+
 // 返回TK_NUM的值
 static int getNumber(Token *Tok){
     if(Tok->Kind != TK_NUM)
@@ -119,7 +131,7 @@ static int readPunct(char *Ptr) {
 // 判断是否为关键字
 static bool isKeyword(Token *Tok){
     // 关键字列表
-    static char *Kw[]={"return", "if", "else", "for", "while"};
+    static char *Kw[]={"return", "if", "else", "for", "while", "int"};
 
     // 遍历关键字列表匹配
     for(int I = 0; I < sizeof(Kw) / sizeof(*Kw); ++I){
@@ -157,6 +169,7 @@ Token *tokenize(char *P){
             // 我们不使用Head来存储信息，仅用来表示链表入口，这样每次都是存储在Cur->Next
             // 否则下述操作将使第一个Token的地址不在Head中。
             Cur->Next = newToken(TK_NUM, P, P);
+            // 指针前进
             Cur = Cur->Next;
             const char *OldPtr = P;
             Cur->Val = strtoul(P, &P, 10);
@@ -166,14 +179,14 @@ Token *tokenize(char *P){
 
         // 解析标记符或关键字
         // [a-zA-Z_][a-zA-Z0-9_]*
-        if (isIdent1(*P)) {
-        char *Start = P;
-        do {
-            ++P;
-        } while (isIdent2(*P));
-        Cur->Next = newToken(TK_IDENT, Start, P);
-        Cur = Cur->Next;
-        continue;
+            if (isIdent1(*P)) {
+            char *Start = P;
+            do {
+                ++P;
+            } while (isIdent2(*P));
+            Cur->Next = newToken(TK_IDENT, Start, P);
+            Cur = Cur->Next;
+            continue;
         }
 
         // 解析操作符
