@@ -16,20 +16,152 @@ main:
 
 # =====程序主体===============
 # 返回语句
-
-  # 调用函数ret5
-  call ret5
+  # 将1加载到a0中
+  li a0, 1
   # 压栈，将a0的值存入栈顶
   addi sp, sp, -8
   sd a0, 0(sp)
-
-  # 调用函数ret3
-  call ret3
+  # 将2加载到a0中
+  li a0, 2
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将3加载到a0中
+  li a0, 3
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将4加载到a0中
+  li a0, 4
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将5加载到a0中
+  li a0, 5
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将6加载到a0中
+  li a0, 6
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将7加载到a0中
+  li a0, 7
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将8加载到a0中
+  li a0, 8
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将9加载到a0中
+  li a0, 9
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 弹栈，将栈顶的值存入a5
+  ld a5, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a4
+  ld a4, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a3
+  ld a3, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a2
+  ld a2, 0(sp)
+  addi sp, sp, 8
   # 弹栈，将栈顶的值存入a1
   ld a1, 0(sp)
   addi sp, sp, 8
-  # a0+a1，结果写入a0
-  add a0, a0, a1
+  # 弹栈，将栈顶的值存入a0
+  ld a0, 0(sp)
+  addi sp, sp, 8
+  # 调用add6函数
+  call add6
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将10加载到a0中
+  li a0, 10
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将11加载到a0中
+  li a0, 11
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将12加载到a0中
+  li a0, 12
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将13加载到a0中
+  li a0, 13
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 弹栈，将栈顶的值存入a5
+  ld a5, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a4
+  ld a4, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a3
+  ld a3, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a2
+  ld a2, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a1
+  ld a1, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a0
+  ld a0, 0(sp)
+  addi sp, sp, 8
+  # 调用add6函数
+  call add6
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将14加载到a0中
+  li a0, 14
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将15加载到a0中
+  li a0, 15
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 将16加载到a0中
+  li a0, 16
+  # 压栈，将a0的值存入栈顶
+  addi sp, sp, -8
+  sd a0, 0(sp)
+  # 弹栈，将栈顶的值存入a5
+  ld a5, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a4
+  ld a4, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a3
+  ld a3, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a2
+  ld a2, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a1
+  ld a1, 0(sp)
+  addi sp, sp, 8
+  # 弹栈，将栈顶的值存入a0
+  ld a0, 0(sp)
+  addi sp, sp, 8
+  # 调用add6函数
+  call add6
   # 跳转到.L.return段
   j .L.return
 
