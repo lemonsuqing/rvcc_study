@@ -6,6 +6,13 @@ Type *TyInt = &(Type){TY_INT};
 // 判断Type是否为int类型
 bool isInteger(Type *Ty) { return Ty->Kind == TY_INT; }
 
+// 复制类型
+Type *copyType(Type *Ty) {
+  Type *Ret = calloc(1, sizeof(Type));
+  *Ret = *Ty;
+  return Ret;
+}
+
 // 指针类型，并且指向基类
 Type *pointerTo(Type *Base) {
   Type *Ty = calloc(1, sizeof(Type));
