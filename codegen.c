@@ -307,7 +307,7 @@ static void assignLVarOffsets(Function *Prog) {
     int Offset = 0;
     // 读取所有变量
     for (Obj *Var = Fn->Locals; Var; Var = Var->Next) {
-      // 每个变量分配8字节
+      // 每个变量分配空间
       Offset += Var->Ty->Size;
       // 为每个变量赋一个偏移量，或者说是栈中地址
       Var->Offset = -Offset;

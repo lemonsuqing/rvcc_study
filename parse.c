@@ -152,14 +152,15 @@ static Type *funcParams(Token **Rest, Token *Tok, Type *Ty) {
   return Ty;
 }
 
-// typeSuffix = ("(" funcParams? ")")?
+// typeSuffix = "(" funcParams | "[" num "]" typeSuffix | ε
 static Type *typeSuffix(Token **Rest, Token *Tok, Type *Ty) {
   if (equal(Tok, "("))
     return funcParams(Rest, Tok->Next, Ty);
 
   if (equal(Tok, "[")) {
     int Sz = getNumber(Tok->Next);
-    *Rest = skip(Tok->Next->Next, "]");
+    Tok = skip(Tok->Next->Next, "]");
+    Ty = typeSuffix(Rest, Tok, Ty);
     return arrayOf(Ty, Sz);
   }
 
