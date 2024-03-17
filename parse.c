@@ -27,7 +27,8 @@ Obj *Locals;
 // relational = add ("<" add |"<=" add | ">" add |">=" add)* 先相等、不等，在大小判断。优先级
 // add = mul ("+" mul | "-" mul)*
 // mul = primary ("*" unary | "/" unary)*
-// unary = ("+" | "-" | "*" | "&") unary | primary 乘数由一元运算数构成，而一元运算数前面可能带有加号或者减号（多个）
+// unary = ("+" | "-" | "*" | "&") unary | postfix 乘数由一元运算数构成，而一元运算数前面可能带有加号或者减号（多个）
+// postfix = primary ("[" expr "]")*
 // primary = "(" expr ")" | ident func-args? | num
 
 // funcall = ident "(" (assign ("," assign)*)? ")"     匹配到标志符之后看看有没有跟括号？有就说明是函数。没有的话就是变量。
@@ -44,6 +45,7 @@ static Node *relational(Token **Rest, Token *Tok);
 static Node *add(Token **Rest, Token *Tok);
 static Node *mul(Token **Rest, Token *Tok);
 static Node *unary(Token **Rest, Token *Tok);
+static Node *postfix(Token **Rest, Token *Tok);
 static Node *primary(Token **Rest, Token *Tok);
 
 // 通过名称，查找一个本地变量
@@ -571,8 +573,25 @@ static Node *unary(Token **Rest, Token *Tok) {
   if (equal(Tok, "*"))
     return newUnary(ND_DEREF, unary(Rest, Tok->Next), Tok);
 
+  // postfix
+  return postfix(Rest, Tok);
+}
+
+// postfix = primary ("[" expr "]")*
+static Node *postfix(Token **Rest, Token *Tok) {
   // primary
-  return primary(Rest, Tok);
+  Node *Nd = primary(&Tok, Tok);
+
+  // ("[" expr "]")*
+  while (equal(Tok, "[")) {
+    // x[y] 等价于 *(x+y)
+    Token *Start = Tok;
+    Node *Idx = expr(&Tok, Tok->Next);
+    Tok = skip(Tok, "]");
+    Nd = newUnary(ND_DEREF, newAdd(Nd, Idx, Start), Start);
+  }
+  *Rest = Tok;
+  return Nd;
 }
 
 // 解析函数调用
